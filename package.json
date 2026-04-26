@@ -1,0 +1,35 @@
+{
+  "name": "ai-multimodal-translation",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.284.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^1.14.0",
+    "tesseract.js": "^4.1.1",
+    "onnxruntime-web": "^1.16.3",
+    "react-dropzone": "^14.2.3",
+    "i18next": "^23.5.1",
+    "react-i18next": "^13.2.2",
+    "jspdf": "^2.5.1"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest"
+  }
+}
