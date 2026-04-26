@@ -1,0 +1,6 @@
+{
+  "name": "Interpreter AI",
+  "description": "Next-generation Multimodal AI Translation with real-time text, speech, and image processing. Features futuristic glassmorphism UI, offline-first architecture, and hybrid AI intelligence.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["text_translation", "speech_translation", "image_ocr_translation"]
+}
