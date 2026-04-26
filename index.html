@@ -2,119 +2,157 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Interpreter AI - نظام ترجمة ذكي متعدد الوسائط | المطور: عبدالرحمن رضوان">
-    <meta name="author" content="عبدالرحمن رضوان">
-    <meta name="theme-color" content="#08081c">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpreter AI 2026 | Web Native OS</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="manifest" href="manifest.json">
-    <title>🌐 Interpreter AI | الترجمة الذكية متعددة الوسائط</title>
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Google Fonts for 2026 Modern Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700;800&family=IBM+Plex+Sans+Arabic:wght@100;400;700&display=swap" rel="stylesheet">
 </head>
-<body>
-
-    <!-- شاشة التحميل -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loader-spinner"></div>
-        <p class="loader-text">جارٍ تشغيل Interpreter AI...</p>
-    </div>
-
-    <!-- الهيدر -->
-    <header class="app-header">
-        <div class="brand">
-            <div class="logo">🌐</div>
-            <div>
-                <div class="app-name">Interpreter AI</div>
-                <div>عبدالرحمن رضوان</div>
-            </div>
-        </div>
-        <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="text">📝 النص</button>
-            <button class="nav-tab" data-tab="speech">🎤 الصوت</button>
-            <button class="nav-tab" data-tab="image">🖼️ الصورة</button>
-        </nav>
-        <div id="connectionBadge" class="connection-badge online">
-            <span class="status-dot"></span> <span id="connectionLabel">متصل</span>
-        </div>
-    </header>
-
-    <div class="main-container">
-        <!-- تبويب النص -->
-        <div class="tab-content active" id="tab-text">
-            <div class="split-screen">
-                <div class="panel source">
-                    <div class="panel-label"><span class="dot"></span> اللغة المصدر</div>
-                    <select class="lang-select" id="sourceLang">
-                        <option value="ar">العربية</option>
-                        <option value="en" selected>English</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                        <option value="zh">中文</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="ru">Русский</option>
-                        <option value="it">Italiano</option>
-                    </select>
-                    <textarea class="text-area" id="sourceText" placeholder="اكتب النص هنا..."></textarea>
-                    <div>
-                        <button class="btn btn-primary" id="translateBtn">✨ ترجمة</button>
-                        <button class="btn btn-secondary" id="detectLangBtn">🔍 اكتشف اللغة</button>
-                    </div>
+<body class="mesh-gradient overflow-hidden">
+    <div id="app" class="h-screen w-screen flex flex-col p-4 md:p-8 gap-6 backdrop-blur-3xl">
+        
+        <!-- Header / OS Top Bar -->
+        <header class="glass-card flex justify-between items-center px-8 py-4 shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                    <span class="text-white font-black text-xl">I</span>
                 </div>
-                <button class="swap-btn" id="swapLangsBtn">⇄</button>
-                <div class="panel target">
-                    <div class="panel-label"><span class="dot"></span> اللغة الهدف</div>
-                    <select class="lang-select" id="targetLang">
-                        <option value="ar" selected>العربية</option>
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                    </select>
-                    <textarea class="text-area" id="targetText" placeholder="الترجمة..." readonly></textarea>
-                    <div>
-                        <button class="btn btn-secondary" id="copyBtn">📋 نسخ</button>
-                        <button class="btn btn-secondary" id="speakBtn">🔊 استماع</button>
-                    </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight">INTERPRETER AI</h1>
+                    <p class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em]">Web Native OS 2026</p>
                 </div>
             </div>
-            <div class="history-section">
-                <h3>📚 سجل الترجمة</h3>
-                <div id="historyList"></div>
-                <button class="btn btn-secondary" id="clearHistoryBtn">🗑 مسح السجل</button>
+            
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex flex-col items-end">
+                    <span id="os-clock" class="text-xs font-mono font-bold">00:00:00</span>
+                    <span class="text-[8px] font-black opacity-30 uppercase">System Latency: 2ms</span>
+                </div>
+                <div class="h-10 w-10 rounded-2xl glass-card flex items-center justify-center border-white/10">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <!-- تبويب الصوت -->
-        <div class="tab-content" id="tab-speech">
-            <div class="speech-container">
-                <canvas class="waveform-canvas" id="waveCanvas"></canvas>
-                <button class="mic-btn" id="micBtn">🎙️</button>
-                <p>انقر وتحدث – ترجمة فورية</p>
-                <div id="speechResult"></div>
-                <div id="speechTrans"></div>
-            </div>
-        </div>
+        <!-- Main Workspace -->
+        <main class="flex-1 flex flex-col md:flex-row gap-6 min-h-0">
+            
+            <!-- Sidebar / Control Panel -->
+            <aside class="w-full md:w-80 flex flex-col gap-6">
+                <!-- Upload Area -->
+                <section id="drop-zone" class="glass-card flex-1 flex flex-col items-center justify-center p-8 border-dashed border-2 border-white/5 hover:border-primary/50 transition-all group cursor-pointer relative overflow-hidden">
+                    <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-sm font-bold text-center">اسحب الملفات هنا</p>
+                    <p class="text-[10px] opacity-40 mt-2">صور، فيديو، صوت، مستندات</p>
+                    <input type="file" id="file-input" class="hidden" multiple>
+                </section>
 
-        <!-- تبويب الصورة -->
-        <div class="tab-content" id="tab-image">
-            <div class="image-upload-zone" id="imageDropZone">
-                <div>🖼️</div>
-                <p>اسحب وأفلت الصورة هنا أو انقر للاختيار</p>
-                <input type="file" id="imageInput" accept="image/*">
+                <!-- Audio Control -->
+                <section class="glass-card p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Live Audio</h3>
+                        <div id="mic-status" class="w-1.5 h-1.5 rounded-full bg-white/10"></div>
+                    </div>
+                    <button id="mic-btn" class="w-full h-14 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center gap-4 transition-all active:scale-95 group">
+                        <div class="w-2 h-2 rounded-full bg-red-500 hidden" id="mic-active"></div>
+                        <span class="text-xs font-bold">بدء التسجيل الحي</span>
+                    </button>
+                    <canvas id="audio-viz" class="w-full h-12 rounded-xl bg-black/20"></canvas>
+                </section>
+            </aside>
+
+            <!-- Center Panel / Results -->
+            <section class="flex-1 glass-card flex flex-col overflow-hidden relative">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                    <h2 class="text-xs font-black opacity-40 uppercase tracking-[0.3em]">AI Processing Lab</h2>
+                    <div class="flex gap-2" id="file-tabs">
+                        <!-- Dynamic Tabs -->
+                    </div>
+                </div>
+                
+                <div id="processing-view" class="flex-1 overflow-y-auto p-8 space-y-8 hidden">
+                    <div class="flex items-start gap-6">
+                        <div id="file-preview" class="w-32 h-32 rounded-3xl glass-card overflow-hidden shrink-0 border-white/10"></div>
+                        <div class="flex-1 space-y-2">
+                            <h3 id="active-filename" class="text-xl font-bold tracking-tight">filename.mp4</h3>
+                            <div class="flex gap-4">
+                                <span id="active-filetype" class="text-[10px] font-mono opacity-40">VIDEO/MP4</span>
+                                <span id="active-filesize" class="text-[10px] font-mono opacity-40">12.5 MB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <span class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Neural Extraction</span>
+                            <span id="progress-percent" class="text-[10px] font-mono text-primary">0%</span>
+                        </div>
+                        <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-primary w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div id="ai-result" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                        <p id="result-text" class="text-sm leading-relaxed text-white/80"></p>
+                        <div id="result-tags" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-view" class="flex-1 flex flex-col items-center justify-center opacity-20">
+                    <svg class="w-24 h-24 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    <p class="text-xs font-bold uppercase tracking-[0.5em]">System Ready</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer / Export System -->
+        <footer class="glass-card h-16 flex items-center justify-between px-8 shrink-0">
+            <div class="flex items-center gap-6">
+                <span class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Export Pipeline:</span>
+                <div class="flex gap-2">
+                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="pdf">PDF</button>
+                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="docx">DOCX</button>
+                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="json">JSON</button>
+                </div>
             </div>
-            <div id="imagePreviewContainer">
-                <img id="imagePreview" alt="معاينة الصورة">
+            <div class="flex items-center gap-4">
+                <p class="text-[10px] font-bold opacity-40">2026 &copy; ABDULRAHMAN RADWAN</p>
             </div>
-            <div id="ocrResult"></div>
-            <div id="ocrTranslation"></div>
-            <button class="btn btn-primary" id="processImageBtn">🔍 استخراج وترجمة</button>
-        </div>
+        </footer>
     </div>
 
-    <footer class="footer">
-        <p>© 2026 <span class="dev">Abdulrahman Radwan</span> — All Rights Reserved</p>
-        <p>Interpreter AI — Intelligent Multimodal Translation System</p>
-    </footer>
+    <script src="assets/js/app.js" type="module"></script>
 
+    <!-- Update Notification UI -->
+    <div id="update-toast" class="fixed bottom-8 left-8 glass-card p-6 flex items-center gap-6 translate-y-32 transition-transform duration-500 z-[100] border-primary/20">
+        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-primary animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </div>
+        <div>
+            <p class="text-xs font-bold">تحديث جديد متوفر!</p>
+            <p class="text-[10px] opacity-40">قم بتحديث المنصة للحصول على أحدث الميزات.</p>
+        </div>
+        <button id="update-btn" class="px-6 py-2 rounded-xl bg-primary text-white text-[10px] font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
+            تحديث الآن
+        </button>
+    </div>
+
+    <style>
+        .fixed { position: fixed; }
+        .bottom-8 { bottom: 2rem; }
+        .left-8 { left: 2rem; }
+        .translate-y-32 { transform: translateY(8rem); }
+        .translate-y-0 { transform: translateY(0); }
+        .z-\[100\] { z-index: 100; }
+    </style>
 </body>
 </html>
