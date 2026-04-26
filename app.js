@@ -1,4 +1,4 @@
-// app.js - التشغيل الرئيسي وربط الأحداث
+// app.js - التشغيل الرئيسي وربط الأحداث (مُصحح)
 document.addEventListener('DOMContentLoaded', async () => {
     await DB.open();
     const history = await DB.getAll();
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         UI.showToast('تم مسح السجل');
     });
 
-    // الصوت
+    // الصوت - إصلاح موجة الرسم وحفظ معرف الإطار
     const waveCanvas = document.getElementById('waveCanvas');
     const ctx = waveCanvas.getContext('2d');
     let waveAnim;
@@ -74,14 +74,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.fillStyle = '#00d4ff';
             ctx.fillRect(i * 12, 50 - h / 2, 8, h);
         }
-        if (SpeechEngine.isRecording) requestAnimationFrame(drawWave);
+        if (SpeechEngine.isRecording) {
+            waveAnim = requestAnimationFrame(drawWave); // تخزين المعرف
+        }
     }
 
-    document.getElementById('micBtn').addEventListener('click', () => {
+    // التحقق من دعم التسجيل الصوتي
+    const micBtn = document.getElementById('micBtn');
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+        micBtn.disabled = true;
+        micBtn.title = 'متصفحك لا يدعم التسجيل الصوتي';
+        UI.showToast('التسجيل الصوتي غير مدعوم في هذا المتصفح');
+    }
+
+    micBtn.addEventListener('click', () => {
         if (SpeechEngine.isRecording) {
             SpeechEngine.stop();
-            document.getElementById('micBtn').classList.remove('recording');
-            cancelAnimationFrame(waveAnim);
+            micBtn.classList.remove('recording');
+            if (waveAnim) {
+                cancelAnimationFrame(waveAnim);
+                waveAnim = null;
+            }
         } else {
             const sourceLang = document.getElementById('sourceLang').value;
             SpeechEngine.start(sourceLang, (text) => {
@@ -89,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 AIEngine.translate(text, sourceLang, document.getElementById('targetLang').value)
                     .then(t => document.getElementById('speechTrans').textContent = t);
             }, (err) => UI.showToast('خطأ: ' + err));
-            document.getElementById('micBtn').classList.add('recording');
+            micBtn.classList.add('recording');
             drawWave();
         }
     });
@@ -133,7 +146,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // إخفاء شاشة التحميل
     setTimeout(() => {
-        document.getElementById('loadingScreen').classList.add('hidden');
-        setTimeout(() => document.getElementById('loadingScreen').remove(), 700);
+        const loader = document.getElementById('loadingScreen');
+        if (loader) {
+            loader.classList.add('hidden');
+            setTimeout(() => loader.remove(), 700);
+        }
     }, 1000);
 });

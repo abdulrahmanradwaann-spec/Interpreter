@@ -1,9 +1,10 @@
-// language-detector.js - كشف اللغة والنبرة
+// language-detector.js - كشف اللغة والنبرة (نسخة مُحسَّنة)
 const LanguageDetector = {
     detect(text) {
+        // ترتيب الأنماط مهم: نبدأ باللغات ذات الأحرف الإضافية قبل العربية الأساسية
         const patterns = {
-            ar: /[\u0600-\u06FF]/,
-            fa: /[\u0600-\u06FF]|[\uFB8A\u067E\u0686\u06AF]/,
+            fa: /[\uFB8A\u067E\u0686\u06AF]/, // الفارسية أولاً لتجنب الخلط مع العربية
+            ar: /[\u0600-\u06FF]/,             // العربية تشمل الفارسية أيضاً (لكن الفحص بدأ من الفارسية)
             zh: /[\u4e00-\u9fff]/,
             ja: /[\u3040-\u309f\u30a0-\u30ff]/,
             ko: /[\uac00-\ud7af]/,
@@ -13,14 +14,23 @@ const LanguageDetector = {
         for (const [lang, re] of Object.entries(patterns)) {
             if (re.test(text)) return lang;
         }
-        return 'en';
+        return 'en'; // لغة افتراضية إن لم تنطبق أي قاعدة
     },
 
     detectTone(text) {
-        if (!text.trim()) return 'محايد';
-        if (/[!！]{2,}/.test(text) || /(عاجل|خطر)/i.test(text)) return 'عاجل';
-        if (/[😊😁🙂]/.test(text) || /(هلا|مرحبا)/i.test(text)) return 'غير رسمي';
-        if (/(حضرة|سعادة|معالي)/i.test(text)) return 'رسمي';
+        // تطبيع النص (إزالة المسافات الزائدة)
+        const cleanText = text.trim();
+        if (!cleanText) return 'محايد';
+
+        // التحقق من الطابع الرسمي (أولوية أعلى لأنه قد يتعايش مع علامات أخرى)
+        if (/(حضرة|سعادة|معالي)/i.test(cleanText)) return 'رسمي';
+
+        // الطابع العاجل
+        if (/[!！]{2,}/.test(cleanText) || /(عاجل|خطر)/i.test(cleanText)) return 'عاجل';
+
+        // الطابع غير الرسمي
+        if (/[😊😁🙂]/.test(cleanText) || /(هلا|مرحبا)/i.test(cleanText)) return 'غير رسمي';
+
         return 'محايد';
     }
 };

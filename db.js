@@ -1,12 +1,19 @@
-// db.js - إدارة IndexedDB
+// db.js - إدارة IndexedDB (نسخة مُحسَّنة)
 const DB = (() => {
     const DB_NAME = 'InterpreterAI_DB';
     const STORE = 'translations';
     let db = null;
+    let openPromise = null; // لتجنب فتح القاعدة أكثر من مرة في نفس الوقت
 
     async function open() {
-        return new Promise((resolve, reject) => {
+        // إذا كان الاتصال موجوداً ومفتوحاً، أرجع فوراً
+        if (db) return db;
+        // إذا كانت عملية فتح قيد التنفيذ، انتظر حتى تنتهي
+        if (openPromise) return openPromise;
+
+        openPromise = new Promise((resolve, reject) => {
             const req = indexedDB.open(DB_NAME, 1);
+
             req.onupgradeneeded = (e) => {
                 const d = e.target.result;
                 if (!d.objectStoreNames.contains(STORE)) {
@@ -14,9 +21,24 @@ const DB = (() => {
                     store.createIndex('timestamp', 'timestamp');
                 }
             };
-            req.onsuccess = (e) => { db = e.target.result; resolve(db); };
-            req.onerror = (e) => reject(e.target.error);
+
+            req.onsuccess = (e) => {
+                db = e.target.result;
+                // إعادة التعيين عند إغلاق القاعدة تلقائياً
+                db.onclose = () => {
+                    db = null;
+                    openPromise = null;
+                };
+                resolve(db);
+            };
+
+            req.onerror = (e) => {
+                openPromise = null; // اسمح بإعادة المحاولة لاحقاً
+                reject(e.target.error);
+            };
         });
+
+        return openPromise;
     }
 
     async function add(entry) {
@@ -35,6 +57,7 @@ const DB = (() => {
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE, 'readonly');
             const store = tx.objectStore(STORE);
+            // التأكد من وجود الفهرس (تم إنشاؤه عند الترقية)
             const index = store.index('timestamp');
             const req = index.openCursor(null, 'prev');
             const result = [];
