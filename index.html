@@ -1,13 +1,141 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Interpreter AI - نظام ترجمة ذكي متعدد الوسائط | المطور: عبدالرحمن رضوان">
+    <meta name="author" content="عبدالرحمن رضوان">
+    <meta name="theme-color" content="#08081c">
+    <link rel="manifest" href="manifest.json">
+    <title>🌐 Interpreter AI | الترجمة الذكية متعددة الوسائط</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <!-- شاشة التحميل -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">جارٍ تشغيل Interpreter AI...</p>
+    </div>
+
+    <!-- الهيدر -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="logo">🌐</div>
+            <div>
+                <div class="app-name">Interpreter AI</div>
+                <div style="font-size:0.65rem; color:var(--text-muted);">عبدالرحمن رضوان</div>
+            </div>
+        </div>
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="text">📝 النص</button>
+            <button class="nav-tab" data-tab="speech">🎤 الصوت</button>
+            <button class="nav-tab" data-tab="image">🖼️ الصورة</button>
+        </nav>
+        <div id="connectionBadge" class="connection-badge online">
+            <span class="status-dot"></span> <span id="connectionLabel">متصل</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- تبويب النص -->
+        <div class="tab-content active" id="tab-text">
+            <div class="split-screen">
+                <div class="panel source">
+                    <div class="panel-label"><span class="dot"></span> اللغة المصدر</div>
+                    <select class="lang-select" id="sourceLang">
+                        <option value="ar">العربية</option>
+                        <option value="en" selected>English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="zh">中文</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="ru">Русский</option>
+                        <option value="it">Italiano</option>
+                    </select>
+                    <textarea class="text-area" id="sourceText" placeholder="اكتب النص هنا..."></textarea>
+                    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" id="translateBtn">✨ ترجمة</button>
+                        <button class="btn btn-secondary" id="detectLangBtn">🔍 اكتشف اللغة</button>
+                    </div>
+                </div>
+                <button class="swap-btn" id="swapLangsBtn">⇄</button>
+                <div class="panel target">
+                    <div class="panel-label"><span class="dot"></span> اللغة الهدف</div>
+                    <select class="lang-select" id="targetLang">
+                        <option value="ar" selected>العربية</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                    <textarea class="text-area" id="targetText" placeholder="الترجمة..." readonly></textarea>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <button class="btn btn-secondary" id="copyBtn">📋 نسخ</button>
+                        <button class="btn btn-secondary" id="speakBtn">🔊 استماع</button>
+                    </div>
+                </div>
+            </div>
+            <div class="history-section">
+                <h3 style="margin-bottom:10px;">📚 سجل الترجمة</h3>
+                <div id="historyList" style="max-height:250px; overflow-y:auto;"></div>
+                <button class="btn btn-secondary" id="clearHistoryBtn" style="margin-top:8px;">🗑 مسح السجل</button>
+            </div>
+        </div>
+
+        <!-- تبويب الصوت -->
+        <div class="tab-content" id="tab-speech">
+            <div class="speech-container">
+                <canvas class="waveform-canvas" id="waveCanvas"></canvas>
+                <button class="mic-btn" id="micBtn">🎙️</button>
+                <p style="color:var(--text-muted);">انقر وتحدث – ترجمة فورية</p>
+                <div id="speechResult" style="background:var(--bg-panel); padding:12px; border-radius:10px; width:100%; max-width:500px; text-align:center;"></div>
+                <div id="speechTrans" style="background:var(--bg-panel); padding:12px; border-radius:10px; width:100%; max-width:500px; text-align:center;"></div>
+            </div>
+        </div>
+
+        <!-- تبويب الصورة -->
+        <div class="tab-content" id="tab-image">
+            <div class="image-upload-zone" id="imageDropZone">
+                <div style="font-size:2.5rem;">🖼️</div>
+                <p>اسحب وأفلت الصورة هنا أو انقر للاختيار</p>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+            <div id="imagePreviewContainer" style="display:none; text-align:center; margin-top:12px;">
+                <img id="imagePreview" style="max-width:100%; max-height:300px; border-radius:12px;">
+            </div>
+            <div id="ocrResult" style="margin-top:12px; background:var(--bg-panel); padding:12px; border-radius:10px;"></div>
+            <div id="ocrTranslation" style="margin-top:8px; background:var(--bg-panel); padding:12px; border-radius:10px;"></div>
+            <button class="btn btn-primary" id="processImageBtn" style="margin-top:10px;">🔍 استخراج وترجمة</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 <span class="dev">Abdulrahman Radwan</span> — All Rights Reserved</p>
+        <p>Interpreter AI — Intelligent Multimodal Translation System</p>
+        <p style="font-style:italic;">صُنع بشغف من أجل تواصل ذكي بلا حدود</p>
+    </footer>
+
+    <!-- المكتبات الخارجية -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <!-- ملفات الجافاسكريبت الخاصة بالمشروع -->
+    <script src="db.js"></script>
+    <script src="language-detector.js"></script>
+    <script src="ai-engine.js"></script>
+    <script src="text-engine.js"></script>
+    <script src="speech-engine.js"></script>
+    <script src="ocr-engine.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+</body>
+</html>
