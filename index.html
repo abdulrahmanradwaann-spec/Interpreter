@@ -1,158 +1,388 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interpreter AI 2026 | Web Native OS</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>نور | مواقيت الصلاة الفاخرة</title>
+
+    <!-- PWA & Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#050505">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="theme-color" content="#020617">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Google Fonts for 2026 Modern Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700;800&family=IBM+Plex+Sans+Arabic:wght@100;400;700&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="تطبيق مواقيت صلاة متطور بتصميم فاخر وتجربة مستخدم استثنائية - المطور عبد الرحمن رضوان">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="mesh-gradient overflow-hidden">
-    <div id="app" class="h-screen w-screen flex flex-col p-4 md:p-8 gap-6 backdrop-blur-3xl">
-        
-        <!-- Header / OS Top Bar -->
-        <header class="glass-card flex justify-between items-center px-8 py-4 shrink-0">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                    <span class="text-white font-black text-xl">I</span>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight">INTERPRETER AI</h1>
-                    <p class="text-[10px] font-black opacity-30 uppercase tracking-[0.3em]">Web Native OS 2026</p>
-                </div>
+
+<body class="dark-mode">
+    <!-- Luxury Loading Screen -->
+    <div id="loader" class="loader-wrapper">
+        <div class="loader-content">
+            <div class="luxury-logo">
+                <svg width="120" height="120" viewBox="0 0 100 100" class="mosque-logo-svg">
+                    <defs>
+                        <linearGradient id="mosque-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#818cf8;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- Mosque Dome and Minarets -->
+                    <path d="M50 20 C35 20 25 35 25 50 L75 50 C75 35 65 20 50 20 Z" fill="url(#mosque-grad)"
+                        filter="url(#glow)" />
+                    <path d="M20 40 L30 40 L30 80 L20 80 Z" fill="url(#mosque-grad)" />
+                    <path d="M70 40 L80 40 L80 80 L70 80 Z" fill="url(#mosque-grad)" />
+                    <path d="M15 80 L85 80 L85 90 L15 90 Z" fill="url(#mosque-grad)" />
+                    <circle cx="50" cy="15" r="3" fill="url(#mosque-grad)" />
+                    <path d="M48 15 L52 15 L52 25 L48 25 Z" fill="url(#mosque-grad)" />
+                </svg>
             </div>
-            
-            <div class="flex items-center gap-6">
-                <div class="hidden md:flex flex-col items-end">
-                    <span id="os-clock" class="text-xs font-mono font-bold">00:00:00</span>
-                    <span class="text-[8px] font-black opacity-30 uppercase">System Latency: 2ms</span>
+            <p class="loader-text">نور</p>
+            <div class="loader-bar-container">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Background Layers -->
+    <div class="bg-wrapper">
+        <div id="dynamic-bg" class="dynamic-bg bg-night"></div>
+        <div id="stars" class="stars-layer"></div>
+        <!-- تم تصحيح الاسم من particles إلى particles -->
+        <div id="particles" class="particles-layer"></div>
+        <div class="glass-overlay"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="date-section">
+                    <div class="current-time-display">
+                        <h2 id="digital-clock">00:00:00</h2>
+                        <span id="time-period">--</span>
+                    </div>
+                    <h1 id="gregorian-date" class="fade-in">--</h1>
+                    <div class="hijri-badge">
+                        <i class="fa-solid fa-moon-stars"></i>
+                        <span id="hijri-date">--</span>
+                    </div>
+                    <div id="ramadan-countdown" class="hijri-badge" style="display: none; margin-top: 8px;">
+                        <i class="fa-solid fa-kaaba"></i>
+                        <span id="ramadan-text">--</span>
+                    </div>
                 </div>
-                <div class="h-10 w-10 rounded-2xl glass-card flex items-center justify-center border-white/10">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <div class="action-buttons">
+                    <button id="location-search-btn" class="icon-btn-luxury" title="البحث عن مدينة">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button id="theme-toggle" class="icon-btn-luxury" title="تبديل الوضع">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <button id="notification-toggle" class="icon-btn-luxury" title="التنبيهات">
+                        <i class="fa-solid fa-bell"></i>
+                    </button>
+                    <button id="settings-btn" class="icon-btn-luxury" title="الإعدادات">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Workspace -->
-        <main class="flex-1 flex flex-col md:flex-row gap-6 min-h-0">
-            
-            <!-- Sidebar / Control Panel -->
-            <aside class="w-full md:w-80 flex flex-col gap-6">
-                <!-- Upload Area -->
-                <section id="drop-zone" class="glass-card flex-1 flex flex-col items-center justify-center p-8 border-dashed border-2 border-white/5 hover:border-primary/50 transition-all group cursor-pointer relative overflow-hidden">
-                    <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg class="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+        <main class="content-area">
+            <!-- Hero Card: Next Prayer & Countdown -->
+            <section class="hero-card fade-up">
+                <div class="hero-glass">
+                    <div class="location-header">
+                        <button id="geo-btn" class="geo-pulse">
+                            <i class="fa-solid fa-location-arrow"></i>
+                        </button>
+                        <div class="location-info">
+                            <h3 id="current-location">تحديد الموقع...</h3>
+                            <p id="precise-area" class="text-muted"></p>
+                        </div>
+                        <!-- Hijri Calendar Trigger -->
+                        <button id="hijri-calendar-btn" class="calendar-trigger-btn" title="التقويم الهجري">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </button>
                     </div>
-                    <p class="text-sm font-bold text-center">اسحب الملفات هنا</p>
-                    <p class="text-[10px] opacity-40 mt-2">صور، فيديو، صوت، مستندات</p>
-                    <input type="file" id="file-input" class="hidden" multiple>
-                </section>
 
-                <!-- Audio Control -->
-                <section class="glass-card p-6 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Live Audio</h3>
-                        <div id="mic-status" class="w-1.5 h-1.5 rounded-full bg-white/10"></div>
+                    <div class="next-prayer-focus">
+                        <span class="next-title">الصلاة القادمة</span>
+                        <h2 id="next-prayer-name" class="glow-text">--</h2>
+                        <div class="countdown-container">
+                            <span id="countdown" class="countdown-timer">00:00:00</span>
+                        </div>
                     </div>
-                    <button id="mic-btn" class="w-full h-14 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center gap-4 transition-all active:scale-95 group">
-                        <div class="w-2 h-2 rounded-full bg-red-500 hidden" id="mic-active"></div>
-                        <span class="text-xs font-bold">بدء التسجيل الحي</span>
-                    </button>
-                    <canvas id="audio-viz" class="w-full h-12 rounded-xl bg-black/20"></canvas>
-                </section>
-            </aside>
 
-            <!-- Center Panel / Results -->
-            <section class="flex-1 glass-card flex flex-col overflow-hidden relative">
-                <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                    <h2 class="text-xs font-black opacity-40 uppercase tracking-[0.3em]">AI Processing Lab</h2>
-                    <div class="flex gap-2" id="file-tabs">
-                        <!-- Dynamic Tabs -->
-                    </div>
-                </div>
-                
-                <div id="processing-view" class="flex-1 overflow-y-auto p-8 space-y-8 hidden">
-                    <div class="flex items-start gap-6">
-                        <div id="file-preview" class="w-32 h-32 rounded-3xl glass-card overflow-hidden shrink-0 border-white/10"></div>
-                        <div class="flex-1 space-y-2">
-                            <h3 id="active-filename" class="text-xl font-bold tracking-tight">filename.mp4</h3>
-                            <div class="flex gap-4">
-                                <span id="active-filetype" class="text-[10px] font-mono opacity-40">VIDEO/MP4</span>
-                                <span id="active-filesize" class="text-[10px] font-mono opacity-40">12.5 MB</span>
+                    <div class="prayer-progress-luxury">
+                        <div class="progress-track">
+                            <div id="prayer-progress" class="progress-fill">
+                                <div class="progress-glow"></div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-end">
-                            <span class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Neural Extraction</span>
-                            <span id="progress-percent" class="text-[10px] font-mono text-primary">0%</span>
-                        </div>
-                        <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div id="progress-bar" class="h-full bg-primary w-0 transition-all duration-300"></div>
-                        </div>
-                    </div>
-
-                    <div id="ai-result" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                        <p id="result-text" class="text-sm leading-relaxed text-white/80"></p>
-                        <div id="result-tags" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
-
-                <!-- Empty State -->
-                <div id="empty-view" class="flex-1 flex flex-col items-center justify-center opacity-20">
-                    <svg class="w-24 h-24 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    <p class="text-xs font-bold uppercase tracking-[0.5em]">System Ready</p>
                 </div>
             </section>
 
+
+
+            <!-- Prayer Grid -->
+            <section id="prayer-list" class="prayer-grid fade-up">
+                <!-- Injected via JS -->
+            </section>
+
+            <!-- Floating Action Tools -->
+            <section class="action-tools fade-up">
+                <button id="qibla-btn" class="tool-card-luxury">
+                    <div class="tool-icon"><i class="fa-solid fa-compass-drafting"></i></div>
+                    <span>اتجاه القبلة</span>
+                </button>
+                <button id="dhikr-btn" class="tool-card-luxury">
+                    <div class="tool-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                    <span>أذكار اليوم</span>
+                </button>
+            </section>
+
+            <!-- Qibla Component (Hidden by default) -->
+            <section id="qibla-overlay" class="modal-luxury qibla-overlay">
+                <div class="modal-blur-bg"></div>
+                <div class="modal-sheet qibla-sheet">
+                    <div class="modal-handle"></div>
+                    <div class="modal-header">
+                        <h2>بوصلة القبلة</h2>
+                        <button class="close-overlay close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body qibla-body">
+                        <div class="compass-wrapper">
+                            <div class="compass-dial">
+                                <div id="compass-arrow" class="compass-needle"></div>
+                                <div class="kaaba-center">
+                                    <i class="fa-solid fa-kaaba"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="qibla-info-luxury">
+                            <p class="qibla-degree">الدرجة: <span id="qibla-deg">--</span>°</p>
+                            <p class="qibla-hint">يرجى وضع الهاتف بشكل مسطح وتحريكه بشكل (8) لمعايرة البوصلة</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
 
-        <!-- Footer / Export System -->
-        <footer class="glass-card h-16 flex items-center justify-between px-8 shrink-0">
-            <div class="flex items-center gap-6">
-                <span class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Export Pipeline:</span>
-                <div class="flex gap-2">
-                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="pdf">PDF</button>
-                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="docx">DOCX</button>
-                    <button class="export-btn px-4 py-1.5 rounded-full bg-white/5 text-[10px] font-bold hover:bg-primary transition-all" data-type="json">JSON</button>
-                </div>
+        <footer class="main-footer">
+            <div class="dhikr-shuffled hero-glass">
+                <p id="daily-dhikr">"أرحنا بها يا بلال"</p>
+                <button id="refresh-dhikr" class="refresh-btn"><i class="fa-solid fa-arrows-rotate"></i></button>
             </div>
-            <div class="flex items-center gap-4">
-                <p class="text-[10px] font-bold opacity-40">2026 &copy; ABDULRAHMAN RADWAN</p>
-            </div>
+            <p class="copyright">© 2026 Abdulrahman Radwan. جميع الحقوق محفوظة.</p>
         </footer>
     </div>
 
-    <script src="assets/js/app.js" type="module"></script>
-
-    <!-- Update Notification UI -->
-    <div id="update-toast" class="fixed bottom-8 left-8 glass-card p-6 flex items-center gap-6 translate-y-32 transition-transform duration-500 z-[100] border-primary/20">
-        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <svg class="w-5 h-5 text-primary animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+    <!-- Adhkar Modal -->
+    <div id="adhkar-modal" class="modal-luxury">
+        <div class="modal-blur-bg"></div>
+        <div class="modal-sheet adhkar-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2>أذكار المسلم</h2>
+                <button class="close-adhkar-modal close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="adhkar-tabs">
+                    <button class="adhkar-tab active" data-category="morning">الصباح</button>
+                    <button class="adhkar-tab" data-category="evening">المساء</button>
+                    <button class="adhkar-tab" data-category="after_prayer">بعد الصلاة</button>
+                </div>
+                <div id="adhkar-list" class="adhkar-content-list">
+                    <!-- Adhkar items will be injected here -->
+                </div>
+            </div>
         </div>
-        <div>
-            <p class="text-xs font-bold">تحديث جديد متوفر!</p>
-            <p class="text-[10px] opacity-40">قم بتحديث المنصة للحصول على أحدث الميزات.</p>
-        </div>
-        <button id="update-btn" class="px-6 py-2 rounded-xl bg-primary text-white text-[10px] font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">
-            تحديث الآن
-        </button>
     </div>
 
-    <style>
-        .fixed { position: fixed; }
-        .bottom-8 { bottom: 2rem; }
-        .left-8 { left: 2rem; }
-        .translate-y-32 { transform: translateY(8rem); }
-        .translate-y-0 { transform: translateY(0); }
-        .z-\[100\] { z-index: 100; }
-    </style>
+    <!-- Location Search Modal -->
+    <div id="location-modal" class="modal-luxury">
+        <div class="modal-blur-bg"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2>البحث عن مدينة</h2>
+                <button class="close-location-modal close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-container-luxury">
+                    <input type="text" id="location-search-input" class="luxury-input"
+                        placeholder="اكتب اسم المدينة هنا...">
+                    <button id="execute-search" class="icon-btn-luxury"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <div id="search-results" class="search-results-list">
+                    <!-- Results will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Luxury Settings Modal -->
+    <div id="settings-modal" class="modal-luxury">
+        <div class="modal-blur-bg"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2>الإعدادات الفاخرة</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>اللغة / Language</label>
+                    <select id="language-switch" class="luxury-input">
+                        <option value="ar">العربية</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label>طريقة الحساب</label>
+                    <select id="calc-method" class="luxury-input">
+                        <option value="3">رابطة العالم الإسلامي</option>
+                        <option value="2">الجمعية الإسلامية لأمريكا الشمالية (ISNA)</option>
+                        <option value="4">جامعة أم القرى (مكة)</option>
+                        <option value="5">الهيئة المصرية العامة للمساحة</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label>نوع التنبيه</label>
+                    <select id="notification-type" class="luxury-input">
+                        <option value="beep">رنة قصيرة (Beep)</option>
+                        <option value="adhan">أذان كامل (Full Adhan)</option>
+                        <option value="silent">صامت (Silent)</option>
+                    </select>
+                </div>
+
+                <div class="setting-group toggle-group">
+                    <label>وضع التركيز (صامت أثناء الصلاة)</label>
+                    <label class="switch-luxury">
+                        <input type="checkbox" id="focus-mode">
+                        <span class="slider-luxury"></span>
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label>تذكير قبل الصلاة</label>
+                    <select id="pre-reminder" class="luxury-input">
+                        <option value="0">إيقاف</option>
+                        <option value="5">قبل بـ 5 دقائق</option>
+                        <option value="10">قبل بـ 10 دقائق</option>
+                        <option value="15">قبل بـ 15 دقائق</option>
+                    </select>
+                </div>
+
+                <div class="setting-group row">
+                    <div class="toggle-item">
+                        <span>صوت التنبيه</span>
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span>الاهتزاز</span>
+                        <label class="switch">
+                            <input type="checkbox" id="vibrate-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label>تعديل يدوي (دقائق)</label>
+                    <div class="adj-grid">
+                        <div class="adj-field"><span>فجر</span><input type="number" id="adj-Fajr" value="0"></div>
+                        <div class="adj-field"><span>ظهر</span><input type="number" id="adj-Dhuhr" value="0"></div>
+                        <div class="adj-field"><span>عصر</span><input type="number" id="adj-Asr" value="0"></div>
+                        <div class="adj-field"><span>مغرب</span><input type="number" id="adj-Maghrib" value="0"></div>
+                        <div class="adj-field"><span>عشاء</span><input type="number" id="adj-Isha" value="0"></div>
+                    </div>
+                </div>
+
+                <button id="save-settings" class="btn-luxury-primary">حفظ الإعدادات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hijri Calendar Modal -->
+    <div id="hijri-modal" class="modal-luxury">
+        <div class="modal-blur-bg"></div>
+        <div class="modal-sheet calendar-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <div class="calendar-nav">
+                    <button id="prev-month" class="nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    <h2 id="calendar-month-year">رمضان 1447</h2>
+                    <button id="next-month" class="nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                </div>
+                <button class="close-hijri-modal close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="calendar-grid-header">
+                    <span>ح</span><span>ن</span><span>ث</span><span>ر</span><span>خ</span><span>ج</span><span>س</span>
+                </div>
+                <div id="calendar-days" class="calendar-days-grid">
+                    <!-- Days injected via JS -->
+                </div>
+                <div class="islamic-events-list">
+                    <h3>المناسبات الإسلامية</h3>
+                    <div id="events-container">
+                        <!-- Events injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Notification Toast -->
+    <div id="update-toast" class="update-toast-luxury">
+        <div class="update-toast-content">
+            <div class="update-icon">🚀</div>
+            <div class="update-text-wrapper">
+                <p id="update-msg" class="update-title">تحديث جديد متوفر!</p>
+                <p id="update-desc" class="update-subtitle">قم بالتحديث للحصول على أفضل تجربة.</p>
+            </div>
+            <div class="update-actions">
+                <button id="update-now" class="btn-update-now">تحديث الآن</button>
+                <button id="update-later" class="btn-update-later">لاحقاً</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Audio -->
+    <audio id="beep-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"
+        preload="auto"></audio>
+    <audio id="adhan-sound" src="https://www.islamcan.com/audio/adhan/azan1.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
 </body>
+
 </html>

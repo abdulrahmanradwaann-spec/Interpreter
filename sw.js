@@ -1,56 +1,27 @@
-const CACHE_NAME = 'interpreter-ai-2026-v1';
-const ASSETS_TO_CACHE = [
-  './index.html',
-  './manifest.json',
-  './assets/css/style.css',
-  './assets/js/app.js',
-  './assets/js/engines.js',
-  './assets/js/security.js'
+const CACHE_NAME = 'prayer-times-yemen-v1';
+const ASSETS = [
+    '/',
+    '/index.html',
+    '/style.css',
+    '/script.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+    'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap'
 ];
 
-// Install Service Worker
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
-    self.skipWaiting();
-});
-
-// Activate & Cleanup
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        return caches.delete(cache);
-                    }
-                })
-            );
-        })
+self.addEventListener('install', (e) => {
+    e.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
     );
 });
 
-// Fetch Strategy: Stale-While-Revalidate
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            const fetchPromise = fetch(event.request).then((networkResponse) => {
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone());
-                });
-                return networkResponse;
-            });
-            return response || fetchPromise;
-        })
+self.addEventListener('fetch', (e) => {
+    e.respondWith(
+        caches.match(e.request).then((res) => res || fetch(e.request))
     );
 });
 
-// Listen for Update Message
 self.addEventListener('message', (event) => {
-    if (event.data === 'SKIP_WAITING') {
+    if (event.data && event.data.action === 'skipWaiting') {
         self.skipWaiting();
     }
 });

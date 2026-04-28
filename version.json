@@ -1,0 +1,8 @@
+{
+    "version": "2.0.1",
+    "changelog": {
+        "ar": "تحديثات أمنية وتحسينات في الأداء وتصميم الواجهة الجديد.",
+        "en": "Security updates, performance improvements, and the new UI design."
+    },
+    "forceUpdate": false
+}
