@@ -20,7 +20,7 @@ const translations = {
         regionEurope: "Europe", regionOceania: "Oceania", footerText: "© 2026 All Rights Reserved | Developer: Abdulrahman Radwan",
         back: "Back to Explore", capital: "Capital", population: "Population", currency: "Currency",
         languages: "Languages", timezone: "Timezone", noData: "No data available", favToggle: "Toggle Favorite",
-        landmarks: "Famous Landmarks", desc: "Overview"
+        landmarks: "Famous Landmarks", desc: "Overview", installApp: "Install App"
     },
     ar: {
         appTitle: "عالم الزمن", localTime: "الوقت المحلي", searchPlaceholder: "ابحث عن الدول أو العواصم...",
@@ -28,7 +28,7 @@ const translations = {
         regionEurope: "أوروبا", regionOceania: "أوقيانوسيا", footerText: "© 2026 جميع الحقوق محفوظة | المطور: عبد الرحمن رضوان",
         back: "العودة للاستكشاف", capital: "العاصمة", population: "عدد السكان", currency: "العملة",
         languages: "اللغات", timezone: "المنطقة الزمنية", noData: "لا توجد بيانات", favToggle: "تفضيل",
-        landmarks: "أشهر المعالم", desc: "نبذة عامة"
+        landmarks: "أشهر المعالم", desc: "نبذة عامة", installApp: "تثبيت التطبيق"
     }
 };
 
@@ -120,6 +120,14 @@ const router = {
     navigate: (path) => {
         window.history.pushState({}, '', '#' + path);
         state.currentRoute = path;
+        
+        // Close mobile menu on navigation
+        const headerActions = d.getElementById('headerActions');
+        const menuBtn = d.getElementById('mobileMenuBtn');
+        if (headerActions && headerActions.classList.contains('open')) {
+            headerActions.classList.remove('open');
+            if (menuBtn) menuBtn.querySelector('i').className = 'fa-solid fa-bars';
+        }
         
         // Professional Page Transition: Show loader before entering the page
         const splash = d.getElementById('splashScreen');
@@ -468,6 +476,53 @@ async function boot() {
     
     // Start Engine
     startGlobalTimeEngine();
+
+    // Mobile Hamburger Menu Logic
+    const menuBtn = d.getElementById('mobileMenuBtn');
+    const headerActions = d.getElementById('headerActions');
+    if (menuBtn && headerActions) {
+        menuBtn.addEventListener('click', () => {
+            headerActions.classList.toggle('open');
+            const icon = menuBtn.querySelector('i');
+            icon.className = headerActions.classList.contains('open') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        });
+        
+        d.addEventListener('click', (e) => {
+            if (!headerActions.contains(e.target) && !menuBtn.contains(e.target) && headerActions.classList.contains('open')) {
+                headerActions.classList.remove('open');
+                menuBtn.querySelector('i').className = 'fa-solid fa-bars';
+            }
+        });
+    }
+
+    // PWA Install Logic
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = d.getElementById('installAppBtn');
+        if (installBtn) installBtn.classList.remove('hidden');
+    });
+
+    const installBtn = d.getElementById('installAppBtn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            }
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        console.log('PWA was installed');
+    });
 
     // Service Worker
     if ('serviceWorker' in navigator) {

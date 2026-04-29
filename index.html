@@ -8,6 +8,9 @@
     <title>ChronoWorld PWA</title>
     
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="styles.css">
     
     <!-- Google Fonts -->
@@ -49,7 +52,11 @@
                 <h1 data-i18n="appTitle">ChronoWorld</h1>
             </div>
             
-            <div class="header-actions">
+            <button id="mobileMenuBtn" class="mobile-menu-btn icon-btn" title="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+            <div class="header-actions" id="headerActions">
                 <div class="local-time-widget">
                     <span class="label" data-i18n="localTime">Local Time</span>
                     <span id="headerLocalTime" class="time tabular-nums">--:--:--</span>
@@ -62,6 +69,10 @@
                 <button id="langToggle" class="icon-btn font-bold">
                     <span class="en-only">AR</span>
                     <span class="ar-only">EN</span>
+                </button>
+
+                <button id="installAppBtn" class="install-btn hidden" data-i18n="installApp">
+                    <i class="fa-solid fa-download"></i> Install
                 </button>
             </div>
         </header>

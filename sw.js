@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chronoworld-spa-v3';
+const CACHE_NAME = 'chronoworld-spa-v4';
 const ASSETS = [
     './',
     './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
     './app.js',
     './data.js',
     './manifest.json',
+    './icon.svg',
     'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Cairo:wght@400;600;700&display=swap',

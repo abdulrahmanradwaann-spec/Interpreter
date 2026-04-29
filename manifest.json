@@ -1,43 +1,18 @@
 {
-  "name": "نور | مواقيت الصلاة في اليمن",
-  "short_name": "نور",
-  "description": "تطبيق مواقيت صلاة متطور بتصميم فاخر وتجربة مستخدم استثنائية",
-  "start_url": "./index.html",
-  "scope": "./",
+  "name": "ChronoWorld",
+  "short_name": "ChronoWorld",
+  "description": "Next-Gen Global World Clock & Country Explorer",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
-  "orientation": "portrait",
-  "dir": "rtl",
-  "lang": "ar",
-  "categories": ["lifestyle", "education", "religion"],
+  "background_color": "#070712",
+  "theme_color": "#070712",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/192/2855/2855171.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/2855/2855171.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshot1.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "الشاشة الرئيسية لتطبيق نور"
     }
   ]
 }

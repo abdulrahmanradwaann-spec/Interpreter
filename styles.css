@@ -409,3 +409,116 @@ html[dir="rtl"] .ai-insight-card { border-left: none; border-right: 4px solid va
     100% { transform: translateY(0px); }
 }
 
+/* ==========================================================================
+   Install Button
+   ========================================================================== */
+.install-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px;
+    font-weight: 700; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px var(--glow-purple); font-family: inherit;
+}
+.install-btn:hover {
+    transform: translateY(-2px); box-shadow: 0 6px 20px var(--glow-blue);
+}
+.install-btn.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Mobile Navigation & Hamburger
+   ========================================================================== */
+.mobile-menu-btn {
+    display: none; font-size: 1.5rem; z-index: 1001; position: relative;
+}
+.mobile-menu-btn i { pointer-events: none; }
+
+/* ==========================================================================
+   Responsive Breakpoints (Mobile-First / Fluid Approach)
+   ========================================================================== */
+   
+/* Mobile (320px - 480px) & Base */
+@media (max-width: 480px) {
+    .main-header { padding: 0.8rem; margin: 0.5rem; flex-wrap: wrap; }
+    .logo h1 { font-size: 1.2rem; }
+    
+    .mobile-menu-btn { display: flex; }
+    
+    .header-actions {
+        position: fixed; top: 0; right: -100%; width: 250px; height: 100vh;
+        background: var(--bg-glass-hover); backdrop-filter: blur(20px);
+        flex-direction: column; justify-content: center; align-items: center;
+        gap: 2rem; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000; border-left: 1px solid var(--border-glass);
+    }
+    html[dir="rtl"] .header-actions { right: auto; left: -100%; border-left: none; border-right: 1px solid var(--border-glass); }
+    
+    .header-actions.open { right: 0; }
+    html[dir="rtl"] .header-actions.open { left: 0; right: auto; }
+    
+    .controls-bar { flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
+    .search-input-wrapper input, .filter-select { padding: 0.8rem; font-size: 0.9rem; }
+    
+    .hero-section { padding: 1.5rem; height: auto; min-height: 40vh; flex-direction: column; justify-content: center; text-align: center; }
+    .hero-content { flex-direction: column; align-items: center; gap: 1rem; }
+    .hero-title-group { flex-direction: column; text-align: center; }
+    .hero-name { font-size: 2rem; }
+    .hero-clock { padding: 1rem; width: 100%; }
+    .hero-time { font-size: 2.5rem; }
+    
+    .details-grid { grid-template-columns: 1fr; }
+    .countries-grid { grid-template-columns: 1fr; }
+    
+    .ai-insight-card { flex-direction: column; text-align: center; align-items: center; padding: 1rem; }
+    .time-badges { position: relative; top: 0; left: 0; right: 0; justify-content: center; margin-bottom: 1rem; width: 100%; }
+}
+
+/* Small Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .main-header { padding: 1rem; }
+    .mobile-menu-btn { display: flex; }
+    .header-actions {
+        position: fixed; top: 0; right: -100%; width: 300px; height: 100vh;
+        background: var(--bg-glass-hover); backdrop-filter: blur(20px);
+        flex-direction: column; justify-content: center; align-items: center;
+        gap: 2rem; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000; border-left: 1px solid var(--border-glass);
+    }
+    html[dir="rtl"] .header-actions { right: auto; left: -100%; border-left: none; border-right: 1px solid var(--border-glass); }
+    .header-actions.open { right: 0; }
+    html[dir="rtl"] .header-actions.open { left: 0; right: auto; }
+    
+    .countries-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-section { height: 40vh; padding: 2rem; }
+    .hero-name { font-size: 2.5rem; }
+    .hero-time { font-size: 3rem; }
+    .details-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .mobile-menu-btn { display: none; }
+    .header-actions { display: flex; flex-direction: row; position: relative; width: auto; height: auto; background: none; border: none; backdrop-filter: none; right: 0; left: 0; padding: 0; }
+    
+    .countries-grid { grid-template-columns: repeat(2, 1fr); }
+    .details-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+    .mobile-menu-btn { display: none; }
+    .header-actions { display: flex; flex-direction: row; position: relative; width: auto; height: auto; background: none; border: none; backdrop-filter: none; right: 0; left: 0; padding: 0; }
+    
+    .countries-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .details-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+}
+
+/* Fix magnetic cursor on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .magnetic-cursor { display: none !important; }
+    .country-card:hover { transform: none; box-shadow: none; border-color: var(--border-glass); }
+    .country-card:active { transform: scale(0.98); }
+    .install-btn:hover { transform: none; box-shadow: 0 4px 15px var(--glow-purple); }
+}
+
