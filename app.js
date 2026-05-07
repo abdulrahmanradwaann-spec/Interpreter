@@ -167,11 +167,15 @@ const router = {
 };
 
 async function toggleFavorite(id, e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
+    const country = state.countries.find(c => c.id === id);
+    const name = state.lang === 'ar' ? (country ? country.nameAr : '') : (country ? country.nameEn : '');
     if(state.favorites.includes(id)) {
         state.favorites = state.favorites.filter(fav => fav !== id);
+        showToast(`${name} ${state.lang === 'ar' ? 'تمت الإزالة من المفضلة' : 'removed from favorites'}`, 'info');
     } else {
         state.favorites.push(id);
+        showToast(`${name} ${state.lang === 'ar' ? 'أضيف إلى المفضلة' : 'added to favorites'}`, 'success');
     }
     await localforage.setItem('favorites', state.favorites);
     router.render();
@@ -210,16 +214,70 @@ function init3DGlobe(container) {
     return () => cancelAnimationFrame(reqId);
 }
 
+function renderQuickStats() {
+    const container = d.createElement('div');
+    container.className = 'quick-stats';
+    const totalCountries = state.countries.length;
+    const totalFavs = state.favorites.length;
+    const regions = [...new Set(state.countries.map(c => c.region))].length;
+    const timezones = [...new Set(state.countries.map(c => c.tz))].length;
+    const stats = [
+        { icon: 'fa-globe', number: totalCountries, label: state.lang === 'ar' ? 'دولة' : 'Countries' },
+        { icon: 'fa-star', number: totalFavs, label: state.lang === 'ar' ? 'مفضلة' : 'Favorites' },
+        { icon: 'fa-clock', number: timezones, label: state.lang === 'ar' ? 'منطقة زمنية' : 'Timezones' },
+        { icon: 'fa-map', number: regions, label: state.lang === 'ar' ? 'قارة' : 'Regions' }
+    ];
+    stats.forEach(s => {
+        const card = d.createElement('div');
+        card.className = 'stat-card glass magnetic-target';
+        card.innerHTML = `<i class="fa-solid ${s.icon} stat-icon"></i>
+            <span class="stat-number tabular-nums">${toArabicDigits(s.number)}</span>
+            <span class="stat-label">${s.label}</span>`;
+        container.appendChild(card);
+    });
+    return container;
+}
+
+function renderTimeZoneStrip() {
+    const cities = [
+        { name: 'London', tz: 'Europe/London' },
+        { name: state.lang === 'ar' ? 'نيويورك' : 'New York', tz: 'America/New_York' },
+        { name: state.lang === 'ar' ? 'دبي' : 'Dubai', tz: 'Asia/Dubai' },
+        { name: state.lang === 'ar' ? 'طوكيو' : 'Tokyo', tz: 'Asia/Tokyo' },
+        { name: state.lang === 'ar' ? 'سيدني' : 'Sydney', tz: 'Australia/Sydney' },
+        { name: state.lang === 'ar' ? 'مكة' : 'Mecca', tz: 'Asia/Riyadh' },
+        { name: state.lang === 'ar' ? 'باريس' : 'Paris', tz: 'Europe/Paris' },
+        { name: state.lang === 'ar' ? 'ساو باولو' : 'São Paulo', tz: 'America/Sao_Paulo' }
+    ];
+    const container = d.createElement('div');
+    container.className = 'tz-strip-container glass magnetic-target';
+    const strip = d.createElement('div');
+    strip.className = 'tz-strip';
+    cities.forEach(city => {
+        const item = d.createElement('div');
+        item.className = 'tz-item';
+        let hour = 12;
+        try { hour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: city.tz, hour: 'numeric', hour12: false }).format(new Date())); } catch(e) {}
+        const isDay = hour >= 6 && hour < 18;
+        item.innerHTML = `<span class="tz-city">${city.name}</span>
+            <span class="tz-time tabular-nums" data-tz="${city.tz}">--:--</span>
+            <span class="tz-indicator ${isDay ? 'day' : 'night'}"></span>`;
+        strip.appendChild(item);
+    });
+    container.appendChild(strip);
+    return container;
+}
+
 function renderDashboard(container) {
     const view = d.createElement('div');
     
-    // 3D Globe Section
-    const globeSec = d.createElement('div');
-    globeSec.className = 'globe-container glass';
-    globeSec.innerHTML = `<div class="globe-overlay" data-i18n="appTitle">ChronoWorld 3D</div>`;
-    view.appendChild(globeSec);
-
-    // Controls
+    // 1. Quick Stats
+    view.appendChild(renderQuickStats());
+    
+    // 2. Timezone Strip
+    view.appendChild(renderTimeZoneStrip());
+    
+    // 3. Controls
     const controls = d.createElement('div');
     controls.className = 'controls-bar magnetic-target';
     controls.innerHTML = `
@@ -228,17 +286,23 @@ function renderDashboard(container) {
             <input type="text" id="searchInput" data-i18n="searchPlaceholder" value="${state.searchQuery}">
         </div>
         <select class="filter-select glass magnetic-target" id="regionFilter">
-            <option value="All" data-i18n="regionAll" ${state.regionFilter==='All'?'selected':''}>All Regions</option>
-            <option value="Africa" data-i18n="regionAfrica" ${state.regionFilter==='Africa'?'selected':''}>Africa</option>
-            <option value="Americas" data-i18n="regionAmericas" ${state.regionFilter==='Americas'?'selected':''}>Americas</option>
-            <option value="Asia" data-i18n="regionAsia" ${state.regionFilter==='Asia'?'selected':''}>Asia</option>
-            <option value="Europe" data-i18n="regionEurope" ${state.regionFilter==='Europe'?'selected':''}>Europe</option>
-            <option value="Oceania" data-i18n="regionOceania" ${state.regionFilter==='Oceania'?'selected':''}>Oceania</option>
+            <option value="All" ${state.regionFilter==='All'?'selected':''}>${translations[state.lang].regionAll}</option>
+            <option value="Africa" ${state.regionFilter==='Africa'?'selected':''}>${translations[state.lang].regionAfrica}</option>
+            <option value="Americas" ${state.regionFilter==='Americas'?'selected':''}>${translations[state.lang].regionAmericas}</option>
+            <option value="Asia" ${state.regionFilter==='Asia'?'selected':''}>${translations[state.lang].regionAsia}</option>
+            <option value="Europe" ${state.regionFilter==='Europe'?'selected':''}>${translations[state.lang].regionEurope}</option>
+            <option value="Oceania" ${state.regionFilter==='Oceania'?'selected':''}>${translations[state.lang].regionOceania}</option>
         </select>
     `;
     view.appendChild(controls);
 
-    // Grid
+    // 4. 3D Globe
+    const globeSec = d.createElement('div');
+    globeSec.className = 'globe-container glass';
+    globeSec.innerHTML = `<div class="globe-overlay">ChronoWorld 3D</div>`;
+    view.appendChild(globeSec);
+
+    // 5. Country Grid
     const grid = d.createElement('div');
     grid.className = 'countries-grid';
     
@@ -246,9 +310,7 @@ function renderDashboard(container) {
         const name = (state.lang === 'ar' ? c.nameAr : c.nameEn).toLowerCase();
         const cap = (state.lang === 'ar' ? c.capitalAr : c.capitalEn).toLowerCase();
         const q = state.searchQuery.toLowerCase();
-        const matchSearch = name.includes(q) || cap.includes(q);
-        const matchRegion = state.regionFilter === 'All' || c.region === state.regionFilter;
-        return matchSearch && matchRegion;
+        return (name.includes(q) || cap.includes(q)) && (state.regionFilter === 'All' || c.region === state.regionFilter);
     });
 
     filtered.sort((a, b) => {
@@ -262,24 +324,37 @@ function renderDashboard(container) {
     filtered.forEach(c => {
         const isFav = state.favorites.includes(c.id);
         const name = state.lang === 'ar' ? c.nameAr : c.nameEn;
+        const capital = state.lang === 'ar' ? c.capitalAr : c.capitalEn;
+        let hour = 12;
+        try { hour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: c.tz, hour: 'numeric', hour12: false }).format(new Date())); } catch(e) {}
+        const isDay = hour >= 6 && hour < 18;
         
         const card = d.createElement('div');
-        card.className = 'country-card glass magnetic-target';
+        card.className = 'country-card magnetic-target';
         card.onclick = () => router.navigate(`/country/${c.id}`);
         
         card.innerHTML = `
+            <div class="card-bg">
+                <img src="https://flagcdn.com/w80/${c.id.toLowerCase()}.png" class="card-bg-flag" alt="">
+                <div class="card-bg-overlay"></div>
+            </div>
             <button class="fav-btn ${isFav ? 'active' : ''} magnetic-target" onclick="toggleFavorite('${c.id}', event)">
                 <i class="fa-solid fa-star"></i>
             </button>
-            <div class="card-header">
-                <div>
-                    <img src="https://flagcdn.com/w80/${c.id.toLowerCase()}.png" class="card-flag" alt="flag">
-                    <h3 class="card-name">${name}</h3>
+            <div class="card-body">
+                <div class="card-top-row">
+                    <span class="card-region-badge">${translations[state.lang]['region'+c.region] || c.region}</span>
+                    <span class="card-time-indicator ${isDay ? 'day' : 'night'}">
+                        <i class="fa-solid fa-${isDay ? 'sun' : 'moon'}"></i>
+                        ${state.lang === 'ar' ? (isDay ? 'نهار' : 'ليل') : (isDay ? 'Day' : 'Night')}
+                    </span>
                 </div>
-            </div>
-            <div class="card-time tabular-nums" data-tz="${c.tz}">--:--:--</div>
-            <div class="card-meta">
-                <span>${translations[state.lang]['region'+c.region] || c.region}</span>
+                <h3 class="card-name">${name}</h3>
+                <span class="card-capital"><i class="fa-solid fa-location-dot"></i> ${capital}</span>
+                <div class="card-time-row">
+                    <span class="card-time tabular-nums" data-tz="${c.tz}">--:--:--</span>
+                    <span class="card-status-dot ${isDay ? 'day' : 'night'}"></span>
+                </div>
             </div>
         `;
         grid.appendChild(card);
@@ -288,21 +363,26 @@ function renderDashboard(container) {
     view.appendChild(grid);
     container.appendChild(view);
 
-    // Init globe slightly after DOM insert
     setTimeout(() => init3DGlobe(globeSec), 50);
 
-    // Event listeners
-    d.getElementById('searchInput').addEventListener('input', (e) => {
-        state.searchQuery = e.target.value;
-        router.render();
-        const input = d.getElementById('searchInput');
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
-    });
-    d.getElementById('regionFilter').addEventListener('change', (e) => {
-        state.regionFilter = e.target.value;
-        router.render();
-    });
+    const searchInput = d.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value;
+            router.render();
+            setTimeout(() => {
+                const inp = d.getElementById('searchInput');
+                if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+            }, 50);
+        });
+    }
+    const regionFilter = d.getElementById('regionFilter');
+    if (regionFilter) {
+        regionFilter.addEventListener('change', (e) => {
+            state.regionFilter = e.target.value;
+            router.render();
+        });
+    }
 }
 
 function renderImmersiveView(container, country) {
@@ -319,11 +399,9 @@ function renderImmersiveView(container, country) {
     const landmarks = getLandmarks(country.id, country.nameEn);
     const bgUrl = landmarks[0];
 
-    // Time Intelligence: Determine Day/Night and Working Hours
-    let hour = 12; // default
+    let hour = 12;
     try {
-        const formatter = new Intl.DateTimeFormat('en-US', { timeZone: country.tz, hour: 'numeric', hour12: false });
-        hour = parseInt(formatter.format(new Date()));
+        hour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: country.tz, hour: 'numeric', hour12: false }).format(new Date()));
     } catch(e) {}
     
     const isDay = hour >= 6 && hour < 18;
@@ -348,18 +426,17 @@ function renderImmersiveView(container, country) {
     view.innerHTML = `
         <button class="back-btn magnetic-target" onclick="router.navigate('/')">
             <i class="fa-solid fa-arrow-${state.lang === 'ar' ? 'right' : 'left'}"></i>
-            <span data-i18n="back">Back</span>
+            <span data-i18n="back">Back to Explore</span>
         </button>
 
         <section class="hero-section glass">
-            <div class="time-badges">
-                ${dayBadge}
-                ${statusBadge}
-            </div>
-            <img src="${bgUrl}" class="hero-bg" alt="Landscape" style="filter: ${bgFilter};">
+            <div class="time-badges">${dayBadge} ${statusBadge}</div>
+            <img src="${bgUrl}" class="hero-bg" alt="" style="filter: ${bgFilter};">
             <div class="hero-content">
                 <div class="hero-title-group">
-                    <img src="https://flagcdn.com/w160/${country.id.toLowerCase()}.png" class="hero-flag" alt="flag">
+                    <div class="hero-flag-wrapper">
+                        <img src="https://flagcdn.com/w160/${country.id.toLowerCase()}.png" alt="flag">
+                    </div>
                     <h2 class="hero-name text-gradient">${name}</h2>
                 </div>
                 <div class="hero-clock">
@@ -370,52 +447,71 @@ function renderImmersiveView(container, country) {
         </section>
 
         <section class="details-grid">
-            <!-- AI Insight Panel -->
             <div class="detail-card glass ai-insight-card">
-                <i class="fa-solid fa-brain ai-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-brain detail-icon"></i></div>
                 <div class="ai-content">
-                    <h4>Smart Insights</h4>
+                    <h4><i class="fa-solid fa-sparkles"></i> ${state.lang==='ar'?'رؤية ذكية':'Smart Insights'}</h4>
                     <p><strong>${state.lang==='ar'?'أفضل وقت للزيارة:':'Best time to visit:'}</strong> ${visitText}</p>
                     <p><strong>${state.lang==='ar'?'معالم ثقافية:':'Cultural Highlights:'}</strong> ${cultureText}</p>
                 </div>
             </div>
 
             <div class="detail-card glass magnetic-target">
-                <i class="fa-solid fa-city detail-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-city detail-icon"></i></div>
                 <span class="detail-label" data-i18n="capital">Capital</span>
                 <span class="detail-value">${capital || '-'}</span>
             </div>
             <div class="detail-card glass magnetic-target">
-                <i class="fa-solid fa-users detail-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-users detail-icon"></i></div>
                 <span class="detail-label" data-i18n="population">Population</span>
                 <span class="detail-value tabular-nums">${toArabicDigits(country.population.toLocaleString())}</span>
             </div>
             <div class="detail-card glass magnetic-target">
-                <i class="fa-solid fa-coins detail-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-coins detail-icon"></i></div>
                 <span class="detail-label" data-i18n="currency">Currency</span>
                 <span class="detail-value">${country.currency || '-'}</span>
             </div>
             <div class="detail-card glass magnetic-target">
-                <i class="fa-solid fa-language detail-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-language detail-icon"></i></div>
                 <span class="detail-label" data-i18n="languages">Languages</span>
                 <span class="detail-value">${country.languagesEn || '-'}</span>
             </div>
             <div class="detail-card glass magnetic-target">
-                <i class="fa-solid fa-clock detail-icon"></i>
+                <div class="detail-icon-wrapper"><i class="fa-solid fa-clock detail-icon"></i></div>
                 <span class="detail-label" data-i18n="timezone">Timezone</span>
                 <span class="detail-value">${country.tz}</span>
             </div>
         </section>
 
+        <section class="description-section glass">
+            <h3><i class="fa-solid fa-book-open"></i> <span data-i18n="desc">Overview</span></h3>
+            <p>${desc || translations[state.lang].noData}</p>
+        </section>
+
         <section class="gallery-section">
-            <h3 data-i18n="landmarks">Famous Landmarks</h3>
-            <div class="landmark-gallery">
-                ${galleryHTML}
-            </div>
+            <h3><i class="fa-solid fa-image"></i> <span data-i18n="landmarks">Famous Landmarks</span></h3>
+            <div class="landmark-gallery">${galleryHTML}</div>
         </section>
     `;
     
     container.appendChild(view);
+}
+
+/* ==========================================================================
+   Toast Notification System
+   ========================================================================== */
+function showToast(message, type = 'info', duration = 3000) {
+    const container = d.getElementById('toastContainer');
+    if (!container) return;
+    const toast = d.createElement('div');
+    toast.className = `toast ${type}`;
+    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+    toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i> <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
 }
 
 /* ==========================================================================
@@ -528,6 +624,25 @@ async function boot() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(console.error);
     }
+
+    // Toast Container
+    const toastContainer = d.createElement('div');
+    toastContainer.id = 'toastContainer';
+    toastContainer.className = 'toast-container';
+    d.body.appendChild(toastContainer);
+
+    // Back to Top Button
+    const backToTop = d.createElement('button');
+    backToTop.id = 'backToTop';
+    backToTop.className = 'back-to-top';
+    backToTop.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    d.body.appendChild(backToTop);
+
+    window.addEventListener('scroll', () => {
+        const btn = d.getElementById('backToTop');
+        if (btn) btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
 
     // Hide Splash Screen after minimum time to show professional animation
     setTimeout(() => {
